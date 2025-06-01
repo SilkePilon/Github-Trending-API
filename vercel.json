@@ -6,7 +6,6 @@
       "use": "@vercel/python",
       "config": {
         "runtime": "python3.9",
-        "pipInstall": true,
         "requirementsFile": "requirements-prod.txt"
       }
     }
