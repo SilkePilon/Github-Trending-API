@@ -5,8 +5,7 @@
       "src": "app/main.py",
       "use": "@vercel/python",
       "config": {
-        "runtime": "python3.9",
-        "requirementsFile": "requirements-prod.txt"
+        "runtime": "python3.9"
       }
     }
   ],
