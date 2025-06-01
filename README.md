@@ -1,4 +1,6 @@
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FSilkePilon%2FGithub-Trending-API)
+
 <p align="center"><img src="docs/trending.png" width="500"></p>
 
 <p align="center">

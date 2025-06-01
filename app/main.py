@@ -25,17 +25,17 @@ from app.scraping import scraping_repositories
 app = fastapi.FastAPI()
 
 
-DOMAIN_NAME = "https://gh-trending-api.herokuapp.com"
+# DOMAIN_NAME = "https://gh-trending-api.herokuapp.com"
 
 
 @app.get("/")
 def help_routes() -> Dict[str, str]:
     """ API endpoints and documentation. """
     return {
-        "repositories": f"{DOMAIN_NAME}/repositories",
-        "developers": f"{DOMAIN_NAME}/developers",
-        "docs": f"{DOMAIN_NAME}/docs",
-        "redoc": f"{DOMAIN_NAME}/redoc",
+        "repositories": "/repositories",
+        "developers": "/developers",
+        "docs": "/docs",
+        "redoc": "/redoc",
     }
 
 
