@@ -87,25 +87,40 @@ def scraping_repositories(
         built_by = []  # Default to empty list
 
         try:
-            # Attempt to get URL and basic identifiers first
-            # Ensure match.h1 and match.h1.a exist before accessing "href"
-            if not (match.h1 and match.h1.a and "href" in match.h1.a.attrs):
-                print(f"Error scraping repository item at rank {rank + 1}: Missing h1 or a tag for rel_url.")
-                continue # Skip this item
-            rel_url = match.h1.a["href"]
+            # Try to find the link tag in h1, h2, or h3
+            link_tag = None
+            h1_tag = match.find("h1")
+            if h1_tag and h1_tag.a and h1_tag.a.has_attr("href"):
+                link_tag = h1_tag.a
+
+            if not link_tag:
+                h2_tag = match.find("h2")
+                if h2_tag and h2_tag.a and h2_tag.a.has_attr("href"):
+                    link_tag = h2_tag.a
+
+            if not link_tag:
+                h3_tag = match.find("h3")
+                if h3_tag and h3_tag.a and h3_tag.a.has_attr("href"):
+                    link_tag = h3_tag.a
+
+            if not link_tag:
+                raise ValueError("Repository link not found within h1, h2, or h3 tags.")
+
+            rel_url = link_tag["href"]
+
+            # These definitions depend on rel_url being successfully extracted.
             repo_url = "https://github.com" + rel_url
 
-            # name of repo
-            # username (author)
+            # Ensure rel_url has enough parts before splitting
             # rel_url is typically /username/reponame
-            parts = rel_url.strip('/').split('/')
-            if len(parts) >= 2:
-                username = parts[-2]
-                repository_name = parts[-1]
+            url_parts = rel_url.strip('/').split('/')
+            if len(url_parts) >= 2:
+                # For /username/reponame, parts[0] is username, parts[1] is reponame
+                username = url_parts[0]
+                repository_name = url_parts[1]
             else:
-                # Handle unexpected URL structure if necessary, or let it raise an error to be caught
-                print(f"Error scraping repository item at rank {rank + 1}: Unexpected rel_url structure: {rel_url}")
-                continue
+                # If the URL format is unexpected, log it and raise an error to skip this item.
+                raise ValueError(f"Unexpected URL format for rel_url: {rel_url}")
 
             # description
             if match.p:
@@ -206,7 +221,7 @@ def scraping_repositories(
             }
             trending_repositories.append(repositories)
         except Exception as e:
-            print(f"Error scraping repository item at rank {rank + 1} for URL {repo_url if 'repo_url' in locals() and repo_url else 'unknown'}: {e}")
+            print(f"Error scraping repository item at rank {rank + 1} for URL {repo_url if repo_url else 'unknown due to early failure'}: {e}")
             # import traceback
             # print(traceback.format_exc())
             continue
