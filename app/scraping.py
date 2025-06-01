@@ -87,23 +87,31 @@ def scraping_repositories(
         built_by = []  # Default to empty list
 
         try:
+            # Attempt to get URL and basic identifiers first
+            # Ensure match.h1 and match.h1.a exist before accessing "href"
+            if not (match.h1 and match.h1.a and "href" in match.h1.a.attrs):
+                print(f"Error scraping repository item at rank {rank + 1}: Missing h1 or a tag for rel_url.")
+                continue # Skip this item
+            rel_url = match.h1.a["href"]
+            repo_url = "https://github.com" + rel_url
+
+            # name of repo
+            # username (author)
+            # rel_url is typically /username/reponame
+            parts = rel_url.strip('/').split('/')
+            if len(parts) >= 2:
+                username = parts[-2]
+                repository_name = parts[-1]
+            else:
+                # Handle unexpected URL structure if necessary, or let it raise an error to be caught
+                print(f"Error scraping repository item at rank {rank + 1}: Unexpected rel_url structure: {rel_url}")
+                continue
+
             # description
             if match.p:
                 description = match.p.get_text(strip=True)
             else:
                 description = None
-
-            # relative url
-            rel_url = match.h1.a["href"]
-
-            # absolute url:
-            repo_url = "https://github.com" + rel_url
-
-            # name of repo
-            repository_name = rel_url.split("/")[-1]
-
-            # author (username):
-            username = rel_url.split("/")[-2]
 
             # language and color
             progr_language = match.find("span", itemprop="programmingLanguage")
@@ -222,19 +230,13 @@ def scraping_developers(
         repo_url = None # For the popular repository
 
         try:
-            # relative url of developer
+            # Attempt to get URL and basic identifiers first
             # Ensure match.div and match.div.a exist before accessing "href"
-            if match.div and match.div.a and "href" in match.div.a.attrs:
-                rel_url = match.div.a["href"]
-            else: # Handle case where expected tags/attributes are missing
+            if not (match.div and match.div.a and "href" in match.div.a.attrs):
                 print(f"Error scraping developer item at rank {rank + 1}: Missing div or a tag for rel_url.")
-                continue
-
-
-            # absolute url of developer
+                continue # Skip this item
+            rel_url = match.div.a["href"]
             dev_url = "https://github.com" + rel_url
-
-            # username of developer
             username = rel_url.strip("/")
 
             # developers full name
@@ -283,7 +285,7 @@ def scraping_developers(
             }
             all_trending_developers.append(one_developer)
         except Exception as e:
-            print(f"Error scraping developer item at rank {rank + 1} for URL {dev_url if 'dev_url' in locals() and dev_url else 'unknown'}: {e}")
+            print(f"Error scraping developer item at rank {rank + 1} for URL {dev_url if dev_url else 'unknown due to early failure'}: {e}")
             # import traceback
             # print(traceback.format_exc())
             continue

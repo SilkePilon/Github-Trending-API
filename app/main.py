@@ -67,10 +67,10 @@ async def trending_repositories(
         raise HTTPException(status_code=502, detail="Received empty response from GitHub. The page structure might have changed, no data is available, or the request was blocked.")
 
     try:
-        articles_html = filter_articles(raw_html)
-        if not articles_html.strip(): # If filter_articles returns empty
-            print(f"Warning in {request.url.path}: filter_articles returned empty content. Potentially no <article> tags found.")
-        soup = make_soup(articles_html)
+        # articles_html = filter_articles(raw_html)
+        # if not articles_html.strip(): # If filter_articles returns empty
+            # print(f"Warning in {request.url.path}: filter_articles returned empty content. Potentially no <article> tags found.")
+        soup = make_soup(raw_html)
         scraped_data = scraping_repositories(soup, since=payload["since"])
         if not scraped_data: # If scraping returns empty list due to no items or all items failed
              print(f"Warning in {request.url.path}: scraping_repositories returned no data. All items might have failed parsing or no items were present.")
@@ -111,10 +111,10 @@ async def trending_repositories_by_progr_language(
         raise HTTPException(status_code=502, detail="Received empty response from GitHub. The page structure might have changed, no data is available, or the request was blocked.")
 
     try:
-        articles_html = filter_articles(raw_html)
-        if not articles_html.strip():
-            print(f"Warning in {request.url.path}: filter_articles returned empty content. Potentially no <article> tags found for {prog_lang}.")
-        soup = make_soup(articles_html)
+        # articles_html = filter_articles(raw_html)
+        # if not articles_html.strip():
+            # print(f"Warning in {request.url.path}: filter_articles returned empty content. Potentially no <article> tags found for {prog_lang}.")
+        soup = make_soup(raw_html)
         scraped_data = scraping_repositories(soup, since=payload["since"])
         if not scraped_data:
              print(f"Warning in {request.url.path}: scraping_repositories returned no data for {prog_lang}. All items might have failed parsing or no items were present.")
